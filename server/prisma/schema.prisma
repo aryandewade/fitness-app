@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workouts  Workout[]
+  runs      Run[]
+  sleepLogs SleepLog[]
+  weightLogs WeightLog[]
+}
+
+model Workout {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now())
+  type      String   // Push, Pull, Legs, Full Body, Custom
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  exercises Exercise[]
+}
+
+model Exercise {
+  id        String   @id @default(uuid())
+  workoutId String
+  workout   Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  name      String
+  sets      Int
+  reps      Int
+  weight    Float?   // isOptional in case of bodyweight or cardio exercises in gym
+  duration  Int?     // in minutes, optional
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Run {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now())
+  distance  Float    // in km or miles
+  duration  Int      // in minutes
+  pace      Float?   // calculated fields can be stored or computed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SleepLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now())
+  duration  Int      // in minutes or hours
+  quality   Int      // 1-5 scale or similar
+  bedTime   DateTime?
+  wakeTime  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WeightLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now())
+  weight    Float
+  bodyFat   Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
