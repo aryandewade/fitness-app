@@ -35,7 +35,7 @@ const workoutSchema = z.object({
         reps: z.coerce.number().min(1),
         weight: z.coerce.number().optional(),
         duration: z.coerce.number().optional(),
-    })).optional(),
+    })),
 });
 
 type WorkoutFormValues = z.infer<typeof workoutSchema>;
@@ -73,7 +73,7 @@ export function Workouts() {
     };
 
     const form = useForm<WorkoutFormValues>({
-        resolver: zodResolver(workoutSchema),
+        resolver: zodResolver(workoutSchema as any),
         defaultValues: {
             date: new Date().toISOString().split('T')[0],
             type: '',
